@@ -27,12 +27,11 @@ struct printchar_handler_data {
 	char *str;
 };
 
-static int str_printchar(struct printchar_handler_data *d, int c) {
+static void str_printchar(struct printchar_handler_data *d, int c) {
 	assert(d != NULL);
 	assert(d->str != NULL);
 
 	*d->str++ = c;
-	return c;
 }
 
 int vsprintf(char *str, const char *format, va_list args) {

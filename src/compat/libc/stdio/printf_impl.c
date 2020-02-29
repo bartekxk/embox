@@ -56,10 +56,10 @@
 //#define PRINT_F_PREC_SHORTENED 4 /* shortened precision for real numbers */
 #define PRINT_F_PREC_DEFAULT   6 /* default precision for real numbers */
 
-static int print_s(int (*printchar_handler)(struct printchar_handler_data *d, int c),
+static int print_s(void (*printchar_handler)(struct printchar_handler_data *d, int c),
 		struct printchar_handler_data *printchar_data,
 		const char *str, int width, int max_len, unsigned int ops) {
-	int pc, len, space_count, ret;
+	int pc, len, space_count;
 
 	assert(printchar_handler != NULL);
 	assert(str != NULL);
@@ -75,38 +75,23 @@ static int print_s(int (*printchar_handler)(struct printchar_handler_data *d, in
 
 	if (!(ops & OPS_FLAG_LEFT_ALIGN)) {
 		pc += space_count;
-		for (; space_count; --space_count) {
-			ret = printchar_handler(printchar_data, ' ');
-			if (ret < 0) {
-				return ret;
-			}
-		}
+		for (; space_count; --space_count) printchar_handler(printchar_data, ' ');
 	}
 
 	pc += len;
-	while (len--){
-		ret = printchar_handler(printchar_data, *str++);
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (len--) printchar_handler(printchar_data, *str++);
 
 	pc += space_count;
-	while (space_count--){
-		ret = printchar_handler(printchar_data, ' ');
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (space_count--) printchar_handler(printchar_data, ' ');
 
 	return pc;
 }
 
-static int print_i(int (*printchar_handler)(struct printchar_handler_data *d, int c),
+static int print_i(void (*printchar_handler)(struct printchar_handler_data *d, int c),
 		struct printchar_handler_data *printchar_data, unsigned long long int u,
 		int is_signed, int width, int min_len, unsigned int ops, int base) {
 	char buff[PRINT_I_BUFF_SZ], *str, *end, *prefix;
-	int pc, ch, len, prefix_len, zero_count, space_count, letter_base, ret;
+	int pc, ch, len, prefix_len, zero_count, space_count, letter_base;
 
 	assert(printchar_handler != NULL);
 	assert(width >= 0);
@@ -141,45 +126,20 @@ static int print_i(int (*printchar_handler)(struct printchar_handler_data *d, in
 
 	if (!(ops & OPS_FLAG_LEFT_ALIGN)) {
 		pc += space_count;
-		for (; space_count; --space_count) {
-			ret = printchar_handler(printchar_data, ' ');
-			if (ret < 0) {
-				return ret;
-			}
-		}
+		for (; space_count; --space_count) printchar_handler(printchar_data, ' ');
 	}
 
 	pc += prefix_len;
-	while (prefix_len--) {
-		ret = printchar_handler(printchar_data, *prefix++);
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (prefix_len--) printchar_handler(printchar_data, *prefix++);
 
 	pc += zero_count;
-	while (zero_count--) {
-		ret = printchar_handler(printchar_data, '0');
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (zero_count--) printchar_handler(printchar_data, '0');
 
 	pc += len;
-	while (len--) {
-		ret = printchar_handler(printchar_data, *str++);
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (len--) printchar_handler(printchar_data, *str++);
 
 	pc += space_count;
-	while (space_count--) {
-		ret = printchar_handler(printchar_data, ' ');
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (space_count--) printchar_handler(printchar_data, ' ');
 
 	return pc;
 }
@@ -201,12 +161,12 @@ static int print_i(int (*printchar_handler)(struct printchar_handler_data *d, in
 #define FABS fabs
 #endif
 
-static int print_f(int (*printchar_handler)(struct printchar_handler_data *d, int c),
+static int print_f(void (*printchar_handler)(struct printchar_handler_data *d, int c),
 		struct printchar_handler_data *printchar_data, long double r, int width,
 		int precision, unsigned int ops, int base, int with_exp, int is_shortened) {
 	char buff[PRINT_F_BUFF_SZ], *str, *end, *prefix, *postfix;
 	DOUBLE ip, fp, ep;
-	int pc, i, ch, len, prefix_len, postfix_len, pad_count, sign_count, zero_left, letter_base, ret;
+	int pc, i, ch, len, prefix_len, postfix_len, pad_count, sign_count, zero_left, letter_base;
 
 	assert(printchar_handler != NULL);
 	assert(width >= 0);
@@ -298,80 +258,45 @@ static int print_f(int (*printchar_handler)(struct printchar_handler_data *d, in
 
 	if (!(ops & (OPS_FLAG_ZERO_PAD | OPS_FLAG_LEFT_ALIGN))) {
 		pc += pad_count;
-		while (pad_count--) {
-			ret = printchar_handler(printchar_data, ' ');
-			if (ret < 0) {
-				return ret;
-			}
-		}
+		while (pad_count--) printchar_handler(printchar_data, ' ');
 	}
 
 	pc += prefix_len;
-	while (prefix_len--) {
-		ret = printchar_handler(printchar_data, *prefix++);
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (prefix_len--) printchar_handler(printchar_data, *prefix++);
 
 	if (ops & OPS_FLAG_ZERO_PAD) {
 		pc += pad_count;
-		while (pad_count--) {
-			ret = printchar_handler(printchar_data, '0');
-			if (ret < 0) {
-				return ret;
-			}
-		}
+		while (pad_count--) printchar_handler(printchar_data, '0');
 	}
 
 	pc += len;
-	while (len--) {
-		ret = printchar_handler(printchar_data, *str++);
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (len--) printchar_handler(printchar_data, *str++);
 
 	pc += zero_left;
-	while (zero_left--) {
-		ret = printchar_handler(printchar_data, '0');
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (zero_left--) printchar_handler(printchar_data, '0');
 
 	pc += postfix_len;
-	while (postfix_len--) {
-		ret = printchar_handler(printchar_data, *postfix++);
-		if (ret < 0) {
-			return ret;
-		}
-	}
+	while (postfix_len--) printchar_handler(printchar_data, *postfix++);
 
 	if (ops & OPS_FLAG_LEFT_ALIGN) {
 		pc += pad_count;
-		while (pad_count--) {
-			ret = printchar_handler(printchar_data, ' ');
-			if (ret < 0) {
-				return ret;
-			}
-		}
+		while (pad_count--) printchar_handler(printchar_data, ' ');
 	}
 
 	return pc;
 }
 #else
-static int print_f(int (*printchar_handler)(struct printchar_handler_data *d, int c),
+static int print_f(void (*printchar_handler)(struct printchar_handler_data *d, int c),
 		struct printchar_handler_data *printchar_data, double r, int width,
 		int precision, unsigned int ops, int base, int with_exp, int is_shortened) {
 	return print_s(printchar_handler, printchar_data, "%f", 0, 0, 0);
 }
 #endif
 
-int __print(int (*printchar_handler)(struct printchar_handler_data *d, int c),
+int __print(void (*printchar_handler)(struct printchar_handler_data *d, int c),
 		struct printchar_handler_data *printchar_data,
 		const char *format, va_list args) {
-	int pc, width, precision, ret;
+	int pc, width, precision;
 	unsigned int ops;
 	const char *begin;
 	union {
@@ -396,10 +321,7 @@ int __print(int (*printchar_handler)(struct printchar_handler_data *d, int c),
 		if (*format != '%') {
 single_print:
 			++pc;
-			ret = printchar_handler(printchar_data, *format);
-			if (ret < 0) {
-				return ret;
-			}
+			printchar_handler(printchar_data, *format);
 			continue;
 		}
 
@@ -444,12 +366,9 @@ after_flags:
 		switch (*format) {
 		default:
 			pc += format - begin + 1;
-			do {
-				ret = printchar_handler(printchar_data, *begin);
-				if (ret < 0) {
-					return ret;
-				}
-			} while (++begin <= format);
+			do
+				printchar_handler(printchar_data, *begin);
+			while (++begin <= format);
 			break;
 		case '%': goto single_print;
 		case 'd':
@@ -462,12 +381,8 @@ after_flags:
 					: ops & OPS_LEN_SIZE ? va_arg(args, ssize_t)
 					: ops & OPS_LEN_PTRDIFF ? va_arg(args, ptrdiff_t)
 					: va_arg(args, int);
-			ret = print_i(printchar_handler, printchar_data, tmp.ulli, 1, width,
+			pc += print_i(printchar_handler, printchar_data, tmp.ulli, 1, width,
 					precision, ops, 10);
-			if (ret < 0) {
-				return ret;
-			}
-			pc += ret;
 			break;
 		case 'u':
 		case 'o':
@@ -481,12 +396,8 @@ after_flags:
 					: ops & OPS_LEN_SIZE ? va_arg(args, size_t)
 					: ops & OPS_LEN_PTRDIFF ? va_arg(args, ptrdiff_t)
 					: va_arg(args, unsigned int);
-			ret = print_i(printchar_handler, printchar_data, tmp.ulli, 0, width,
+			pc += print_i(printchar_handler, printchar_data, tmp.ulli, 0, width,
 					precision, ops, *format == 'u' ? 10 : (*format == 'o' ? 8 : 16));
-			if (ret < 0) {
-				return ret;
-			}
-			pc += ret;
 			break;
 		case 'f':
 		case 'F':
@@ -498,45 +409,29 @@ after_flags:
 		case 'A':
 			tmp.ld = ops & OPS_LEN_LONGFP ? va_arg(args, long double)
 					: va_arg(args, double);
-			ret = print_f(printchar_handler, printchar_data, tmp.ld,
+			pc += print_f(printchar_handler, printchar_data, tmp.ld,
 					width, precision, ops, tolower(*format) == 'a' ? 16 : 10,
 					tolower(*format) == 'e' || tolower(*format) == 'a',
 					tolower(*format) == 'g');
-			if (ret < 0) {
-				return ret;
-			}
-			pc += ret;
 			break;
 		case 'c':
 			/* TODO handle (ops & OPS_LEN_LONG) for wint_t */
 			tmp.ca[0] = (char)va_arg(args, int);
 			tmp.ca[1] = '\0';
-			ret = print_s(printchar_handler, printchar_data, &tmp.ca[0],
+			pc += print_s(printchar_handler, printchar_data, &tmp.ca[0],
 					width, precision, ops);
-			if (ret < 0) {
-				return ret;
-			}
-			pc += ret;
 			break;
 		case 's':
 			/* TODO handle (ops & OPS_LEN_LONG) for wchar_t* */
 			tmp.cp = va_arg(args, char *);
-			ret = print_s(printchar_handler, printchar_data,
+			pc += print_s(printchar_handler, printchar_data,
 					tmp.cp ? tmp.cp : PRINT_S_NULL_STR, width, precision, ops);
-			if (ret < 0) {
-				return ret;
-			}
-			pc += ret;
 			break;
 		case 'p':
 			tmp.vp = va_arg(args, void *);
-			ret = print_i(printchar_handler, printchar_data, (size_t)tmp.vp, 0,
+			pc += print_i(printchar_handler, printchar_data, (size_t)tmp.vp, 0,
 					width, sizeof tmp.vp * 2 + 2,
 					ops | (OPS_FLAG_WITH_SPEC | OPS_FLAG_ZERO_PAD), 16);
-			if (ret < 0) {
-				return ret;
-			}
-			pc += ret;
 			break;
 		case 'n':
 			if (ops & OPS_LEN_MIN) *va_arg(args, signed char *) = (signed char)pc;
