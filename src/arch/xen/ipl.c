@@ -6,8 +6,7 @@
  * @date    18.03.2018
  */
 
-#include <stdint.h>
-#include <xen/xen.h>
+#include <xen/event.h>
 #include <hal/ipl.h>
 
 extern shared_info_t xen_shared_info;

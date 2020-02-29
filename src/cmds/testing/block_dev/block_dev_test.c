@@ -490,7 +490,7 @@ int main(int argc, char **argv) {
 				print_block_devs();
 				return 0;
 			case 'i':
-				iters = strtol(optarg, NULL, 0);
+				iters = strtol(argv[optind], NULL, 0);
 				break;
 		        case 's':
 				s_block = strtoll(optarg, NULL, 0);
