@@ -1,4 +1,0 @@
-package third_party
-
-@Build(stage=1,script="$(EXTERNAL_MAKE) download extract install")
-static module xen_headers { }

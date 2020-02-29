@@ -14,7 +14,9 @@
 #include <xen/io/console.h>
 #include <xen_hypercall-x86_32.h>
 
-#include <barrier.h>
+#include <xen/sched.h>
+#include <xen_barrier.h>
+#include <xen/event.h>
 
 #include <assert.h>
 
